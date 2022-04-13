@@ -11,5 +11,13 @@ public class Evaluator {
 		System.out.println(Evaluator.eval(new DivExpression(
 				new PlusExpression(new Literal(5), new Literal(13)), 
 				new MultExpression(new Literal(2), new Literal(9)))));
+		
+		
+		Scope.memory.put("bla", 5d);
+		Scope scope = new Scope("blo", new PlusExpression(new Identifier("bla"), new Literal(1))
+				, new MultExpression(new Identifier("blo"), new Literal(1000)));
+		
+		System.out.println(Evaluator.eval(scope));
+		
 	}
 }
