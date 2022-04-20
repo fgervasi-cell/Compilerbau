@@ -8,6 +8,7 @@ import java.util.List;
 public class Scanner {
 
 	private static final int WHITESPACE = 32;
+	private static final int TABSPACE = 9;
 	private final String source;
 	private final List<Token> tokens = new ArrayList<>();
 
@@ -225,7 +226,7 @@ public class Scanner {
 						&& (int) chars[i + 5] != WHITESPACE) {
 					state = States.READING_FALSE;
 					returnToken.add(new Token(TokenType.FALSE, "false", "false", lineNumber));
-				} else if (chars[i + 1] == 'o' && chars[i + 2] == 'r' && (int) chars[i + 3] == WHITESPACE) {
+				} else if (chars[i + 1] == 'o' && chars[i + 2] == 'r' && searchNextChar(i + 3, '(', chars)) {
 					state = States.READING_FOR;
 					returnToken.add(new Token(TokenType.FOR, "for", "for", lineNumber));
 				} else if (state == States.READING_IDENTIFIER || state == States.START) {
@@ -323,7 +324,7 @@ public class Scanner {
 				}
 				break;
 			case 'i':
-				if (chars[i + 1] == 'f' && (int) chars[i + 2] == WHITESPACE) {
+				if (chars[i + 1] == 'f' && searchNextChar(i + 2, '(', chars)) {
 					state = States.READING_IF;
 					returnToken.add(new Token(TokenType.IF, "if", "if", lineNumber));
 				} else if (state == States.START || state == States.READING_IDENTIFIER) {
@@ -355,7 +356,7 @@ public class Scanner {
 				break;
 			case 'w':
 				if (chars[i + 1] == 'h' && chars[i + 2] == 'i' && chars[i + 3] == 'l' && chars[i + 4] == 'e'
-						&& (int) chars[i + 5] == WHITESPACE) {
+						&& searchNextChar(i + 5, '(', chars)) {
 					state = States.READING_WHILE;
 					returnToken.add(new Token(TokenType.WHILE, "while", "while", lineNumber));
 				} else if (state == States.READING_IDENTIFIER || state == States.START) {
@@ -396,6 +397,15 @@ public class Scanner {
 		}
 		memory.clear();
 		return builder.toString().trim();
+	}
+	
+	private boolean searchNextChar(int startIndex, char searchChar, char[] chars) {
+		for (int i = startIndex; i < chars.length; i++) {
+			if ((int) chars[i] != WHITESPACE && (int) chars[i] != TABSPACE) {
+				return chars[i] == searchChar;
+			}
+		}
+		return false;
 	}
 
 	public List<Token> scan() {
