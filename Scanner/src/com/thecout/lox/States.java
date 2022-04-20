@@ -13,4 +13,12 @@ public final class States {
 	public static final int READING_NUMBER = 7;
 	public static final int READING_STRING = 8;
 	public static final int READING_PRINT = 9;
+	public static final int READING_VAR = 10;
+	public static final int READING_IF = 11;
+	public static final int READING_ELSE = 12;
+	public static final int READING_RETURN = 13;
+	public static final int READING_TRUE = 14;
+	public static final int READING_FALSE = 15;
+	public static final int READING_WHILE = 16;
+	public static final int READING_FOR = 17;
 }

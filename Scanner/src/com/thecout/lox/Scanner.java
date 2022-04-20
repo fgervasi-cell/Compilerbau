@@ -216,14 +216,23 @@ public class Scanner {
 				}
 				break;
 			case 'f':
-				if (chars[i + 1] == 'u' && chars[i + 2] == 'n' && (int) chars[i + 3] == WHITESPACE) {
+				if (state == States.READING_STRING) {
+					memory.add(chars[i]);
+				} else if (chars[i + 1] == 'u' && chars[i + 2] == 'n' && (int) chars[i + 3] == WHITESPACE) {
 					state = States.READING_FUN;
 					returnToken.add(new Token(TokenType.FUN, "fun", "fun", lineNumber));
-				} else if (state == States.READING_STRING) {
-					memory.add(chars[i]);
-				} else {
+				} else if (chars[i + 1] == 'a' && chars[i + 2] == 'l' && chars[i + 3] == 's' && chars[i + 4] == 'e'
+						&& (int) chars[i + 5] != WHITESPACE) {
+					state = States.READING_FALSE;
+					returnToken.add(new Token(TokenType.FALSE, "false", "false", lineNumber));
+				} else if (chars[i + 1] == 'o' && chars[i + 2] == 'r' && (int) chars[i + 3] == WHITESPACE) {
+					state = States.READING_FOR;
+					returnToken.add(new Token(TokenType.FOR, "for", "for", lineNumber));
+				} else if (state == States.READING_IDENTIFIER || state == States.START) {
 					state = States.READING_IDENTIFIER;
 					memory.add(chars[i]);
+				} else if (state == States.READING_IF) {
+					state = States.START;
 				}
 				break;
 			case 'n':
@@ -234,6 +243,8 @@ public class Scanner {
 				} else if (state == States.START || state == States.READING_IDENTIFIER) {
 					state = States.READING_IDENTIFIER;
 					memory.add(chars[i]);
+				} else if (state == States.READING_RETURN) {
+					state = States.START;
 				}
 				break;
 			case '0':
@@ -263,18 +274,102 @@ public class Scanner {
 						&& (int) chars[i + 5] == WHITESPACE) {
 					state = States.READING_PRINT;
 					returnToken.add(new Token(TokenType.PRINT, "print", "print", lineNumber));
-				} else {
+				} else if (state == States.START || state == States.READING_IDENTIFIER) {
 					state = States.READING_IDENTIFIER;
+					memory.add(chars[i]);
+				} else if (state == States.READING_STRING) {
 					memory.add(chars[i]);
 				}
 				break;
 			case 't':
-				if (state == States.READING_PRINT) {
+				if (state == States.READING_STRING) {
+					memory.add(chars[i]);
+				} else if (chars[i + 1] == 'r' && chars[i + 2] == 'u' && chars[i + 3] == 'e'
+						/*&& (int) chars[i + 4] != WHITESPACE*/) {
+					state = States.READING_TRUE;
+					returnToken.add(new Token(TokenType.TRUE, "true", "true", lineNumber));
+				} else if (state == States.READING_PRINT) {
 					state = States.START;
 				} else if (state == States.START || state == States.READING_IDENTIFIER) {
 					state = States.READING_IDENTIFIER;
 					memory.add(chars[i]);
 				}
+				break;
+			case 'v':
+				if (chars[i + 1] == 'a' && chars[i + 2] == 'r' && chars[i + 3] == WHITESPACE) {
+					state = States.READING_VAR;
+					returnToken.add(new Token(TokenType.VAR, "var", "var", lineNumber));
+				} else if (state == States.START || state == States.READING_IDENTIFIER) {
+					state = States.READING_IDENTIFIER;
+					memory.add(chars[i]);
+				} else if (state == States.READING_STRING) {
+					memory.add(chars[i]);
+				}
+				break;
+			case 'r':
+				if (chars[i + 1] == 'e' && chars[i + 2] == 't' && chars[i + 3] == 'u' && chars[i + 4] == 'r'
+						&& chars[i + 5] == 'n' && chars[i + 6] == WHITESPACE) {
+					state = States.READING_RETURN;
+					returnToken.add(new Token(TokenType.RETURN, "return", "return", lineNumber));
+				} else if (state == States.READING_VAR) {
+					state = States.START;
+				} else if (state == States.START || state == States.READING_IDENTIFIER) {
+					state = States.READING_IDENTIFIER;
+					memory.add(chars[i]);
+				} else if (state == States.READING_STRING) {
+					memory.add(chars[i]);
+				} else if (state == States.READING_FOR) {
+					state = States.START;
+				}
+				break;
+			case 'i':
+				if (chars[i + 1] == 'f' && (int) chars[i + 2] == WHITESPACE) {
+					state = States.READING_IF;
+					returnToken.add(new Token(TokenType.IF, "if", "if", lineNumber));
+				} else if (state == States.START || state == States.READING_IDENTIFIER) {
+					state = States.READING_IDENTIFIER;
+					memory.add(chars[i]);
+				} else if (state == States.READING_STRING) {
+					memory.add(chars[i]);
+				}
+				break;
+			case 'e':
+				if (chars[i + 1] == 'l' && chars[i + 2] == 's' && chars[i + 3] == 'e'
+						&& (int) chars[i + 4] == WHITESPACE) {
+					state = States.READING_ELSE;
+					returnToken.add(new Token(TokenType.ELSE, "else", "else", lineNumber));
+				} else if (state == States.START || state == States.READING_IDENTIFIER) {
+					state = States.READING_IDENTIFIER;
+					memory.add(chars[i]);
+				} else if (state == States.READING_STRING) {
+					memory.add(chars[i]);
+				} else if (state == States.READING_ELSE) {
+					state = States.START;
+				} else if (state == States.READING_TRUE) {
+					state = States.START;
+				} else if (state == States.READING_FALSE) {
+					state = States.START;
+				} else if (state == States.READING_WHILE) {
+					state = States.START;
+				}
+				break;
+			case 'w':
+				if (chars[i + 1] == 'h' && chars[i + 2] == 'i' && chars[i + 3] == 'l' && chars[i + 4] == 'e'
+						&& (int) chars[i + 5] == WHITESPACE) {
+					state = States.READING_WHILE;
+					returnToken.add(new Token(TokenType.WHILE, "while", "while", lineNumber));
+				} else if (state == States.READING_IDENTIFIER || state == States.START) {
+					state = States.READING_IDENTIFIER;
+					memory.add(chars[i]);
+				} else if (state == States.READING_STRING) {
+					memory.add(chars[i]);
+				}
+				break;
+			case '&':
+				returnToken.add(new Token(TokenType.AND, "&", '&', lineNumber));
+				break;
+			case '|':
+				returnToken.add(new Token(TokenType.OR, "|", '|', lineNumber));
 				break;
 			default:
 				if ((state == States.START || state == States.READING_IDENTIFIER) && (int) chars[i] != WHITESPACE) {
